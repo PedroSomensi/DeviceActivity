@@ -24,21 +24,19 @@ struct TotalActivityReport: DeviceActivityReportScene {
     let content: (DeviceActivity) -> TotalActivityView
     
     func makeConfiguration(representing data: DeviceActivityResults<DeviceActivityData>) async -> DeviceActivity {
-        var res = ""
+        
         var list: [AppReport] = []
         let totalActivityDuration = await data.flatMap { $0.activitySegments }.reduce(0, {
             $0 + $1.totalActivityDuration
         })
-        for await d in data {
-            res += d.user.appleID!.debugDescription
-            res += d.lastUpdatedDate.description
-            for await a in d.activitySegments{
-                res += a.totalActivityDuration.formatted()
-                for await c in a.categories {
-                    for await ap in c.applications {
-                        let appName = (ap.application.localizedDisplayName ?? "nil")
-                        let bundle = (ap.application.bundleIdentifier ?? "nil")
-                        let duration = ap.totalActivityDuration
+        
+        for await _data in data {
+            for await activity in _data.activitySegments{
+                for await category in activity.categories {
+                    for await app in category.applications {
+                        let appName = (app.application.localizedDisplayName ?? "nil")
+                        let bundle = (app.application.bundleIdentifier ?? "nil")
+                        let duration = app.totalActivityDuration
                         let app = AppReport(id: bundle, name: appName, duration: duration)
                         list.append(app)
                     }
