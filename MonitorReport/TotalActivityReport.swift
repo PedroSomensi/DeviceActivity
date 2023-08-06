@@ -31,7 +31,7 @@ struct TotalActivityReport: DeviceActivityReportScene {
         })
         
         for await _data in data {
-            for await activity in _data.activitySegments{
+            for await activity in _data.activitySegments {
                 for await category in activity.categories {
                     for await app in category.applications {
                         let appName = (app.application.localizedDisplayName ?? "nil")
